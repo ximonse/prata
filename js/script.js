@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const audioPlayer = document.getElementById('audioPlayer');
     const audioElement = document.getElementById('audioElement');
     const downloadBtn = document.getElementById('downloadBtn');
+    const loadingIndicator = document.getElementById('loadingIndicator');
     
     let audioBlob = null;
     
@@ -16,8 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         try {
+            // Visa att något händer
             convertBtn.disabled = true;
             convertBtn.textContent = 'Konverterar...';
+            loadingIndicator.style.display = 'block';
             
             const response = await fetch('/.netlify/functions/text-to-speech', {
                 method: 'POST',
@@ -29,6 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     voice: voiceSelect.value
                 })
             });
+            
+            // Dölj laddningsindikatorn oavsett resultat
+            loadingIndicator.style.display = 'none';
             
             if (!response.ok) {
                 throw new Error('Något gick fel vid konverteringen');
@@ -49,6 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
             convertBtn.disabled = false;
             convertBtn.textContent = 'Konvertera till tal';
         } catch (error) {
+            // Dölj laddningsindikatorn vid fel
+            loadingIndicator.style.display = 'none';
             alert(`Error: ${error.message}`);
             convertBtn.disabled = false;
             convertBtn.textContent = 'Konvertera till tal';
