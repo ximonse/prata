@@ -136,3 +136,26 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(a);
     });
 });
+// Testa Netlify-funktionen
+const testBtn = document.getElementById('testBtn');
+if (testBtn) {
+    testBtn.addEventListener('click', async () => {
+        console.log('Testar Netlify-funktion...');
+        try {
+            const response = await fetch('/.netlify/functions/test-endpoint', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ test: true })
+            });
+            
+            const data = await response.json();
+            console.log('Test-respons:', data);
+            alert(`Test resultat: ${JSON.stringify(data, null, 2)}`);
+        } catch (error) {
+            console.error('Test-fel:', error);
+            alert(`Test-fel: ${error.message}`);
+        }
+    });
+}
