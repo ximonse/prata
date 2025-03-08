@@ -5,15 +5,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const voiceSelect = document.getElementById('voiceSelect');
     const convertBtn = document.getElementById('convertBtn');
     const audioPlayer = document.getElementById('audioPlayer');
-    const audioElement = document.getElementById('audioElement');
-    const downloadBtn = document.getElementById('downloadBtn');
     const loadingIndicator = document.getElementById('loadingIndicator');
     const charCount = document.getElementById('charCount');
     const costEstimate = document.getElementById('costEstimate');
     const fileUpload = document.getElementById('fileUpload');
+    const uploadStatus = document.getElementById('upload-status');
     
     const MAX_CHARS_PER_SEGMENT = 4090;
     let audioBlobs = [];
+    
+    // Ställ in arbetssökvägen för PDF.js
+    if (window.pdfjsLib) {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
     
     // Uppdatera kostnad och teckenantal medan användaren skriver
     textInput.addEventListener('input', updateCounters);
@@ -34,17 +38,72 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    // Extrahera text från PDF
+    async function extractTextFromPDF(file) {
+        if (!window.pdfjsLib) {
+            alert('PDF.js biblioteket kunde inte laddas. Kan inte läsa PDF-filer.');
+            return '';
+        }
+        
+        try {
+            uploadStatus.innerHTML = '<div class="spinner"></div><p>Bearbetar PDF-fil...</p>';
+            uploadStatus.style.display = 'block';
+            
+            // Läs filen som en ArrayBuffer
+            const arrayBuffer = await file.arrayBuffer();
+            
+            // Ladda PDF-dokumentet
+            const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            console.log(`PDF laddad, antal sidor: ${pdf.numPages}`);
+            
+            let allText = '';
+            
+            // Extrahera text från varje sida
+            for (let i = 1; i <= pdf.numPages; i++) {
+                uploadStatus.innerHTML = `<div class="spinner"></div><p>Bearbetar sida ${i} av ${pdf.numPages}...</p>`;
+                
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                
+                // Kombinera texten från alla textdelar på sidan
+                const pageText = textContent.items.map(item => item.str).join(' ');
+                allText += pageText + '\n\n';
+            }
+            
+            uploadStatus.style.display = 'none';
+            return allText;
+        } catch (error) {
+            console.error('Fel vid läsning av PDF:', error);
+            uploadStatus.innerHTML = `<p class="error">Kunde inte läsa PDF: ${error.message}</p>`;
+            return '';
+        }
+    }
+    
     // Hantera filuppladdning
-    fileUpload.addEventListener('change', (event) => {
+    fileUpload.addEventListener('change', async (event) => {
         const file = event.target.files[0];
         if (!file) return;
         
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            textInput.value = e.target.result;
-            updateCounters();
-        };
-        reader.readAsText(file);
+        try {
+            if (file.type === 'application/pdf') {
+                // Hantera PDF-fil
+                const pdfText = await extractTextFromPDF(file);
+                textInput.value = pdfText;
+            } else {
+                // Hantera textfil
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    textInput.value = e.target.result;
+                };
+                reader.readAsText(file);
+            }
+            
+            // Uppdatera räknare när innehållet är inläst
+            setTimeout(updateCounters, 100);
+        } catch (error) {
+            console.error('Fel vid filuppladdning:', error);
+            alert(`Kunde inte läsa fil: ${error.message}`);
+        }
     });
     
     // Funktion för att dela upp texten i segment på max 4090 tecken
