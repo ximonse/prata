@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prata</title>
     <link rel="stylesheet" href="css/style.css">
+    <!-- Lägg till PDF.js biblioteket -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -12,8 +14,9 @@
         
         <div class="input-area">
             <div class="upload-container">
-                <label for="fileUpload" class="upload-label">Ladda upp textfil</label>
-                <input type="file" id="fileUpload" accept=".txt,.md,.html,.csv,.doc,.docx" />
+                <label for="fileUpload" class="upload-label">Ladda upp fil (text eller PDF)</label>
+                <input type="file" id="fileUpload" accept=".txt,.md,.html,.csv,.doc,.docx,.pdf" />
+                <div id="upload-status"></div>
             </div>
             
             <textarea id="textInput" placeholder="Skriv eller klistra in text här..."></textarea>
