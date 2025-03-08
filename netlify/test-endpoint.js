@@ -1,3 +1,4 @@
+// Flyttad till korrekt plats som netlify/functions/test-endpoint.js
 exports.handler = async function(event, context) {
   return {
     statusCode: 200,
