@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const audioElement = document.getElementById('audioElement');
     const downloadBtn = document.getElementById('downloadBtn');
     const loadingIndicator = document.getElementById('loadingIndicator');
+    const testBtn = document.getElementById('testBtn');
     
     let audioBlob = null;
     
@@ -19,7 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
         audioPlayer: !!audioPlayer,
         audioElement: !!audioElement,
         downloadBtn: !!downloadBtn,
-        loadingIndicator: !!loadingIndicator
+        loadingIndicator: !!loadingIndicator,
+        testBtn: !!testBtn
     });
     
     convertBtn.addEventListener('click', async () => {
@@ -135,27 +137,27 @@ document.addEventListener('DOMContentLoaded', () => {
         a.click();
         document.body.removeChild(a);
     });
+    
+    // Testa Netlify-funktionen
+    if (testBtn) {
+        testBtn.addEventListener('click', async () => {
+            console.log('Testar Netlify-funktion...');
+            try {
+                const response = await fetch('/.netlify/functions/test-endpoint', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ test: true })
+                });
+                
+                const data = await response.json();
+                console.log('Test-respons:', data);
+                alert(`Test resultat: ${JSON.stringify(data, null, 2)}`);
+            } catch (error) {
+                console.error('Test-fel:', error);
+                alert(`Test-fel: ${error.message}`);
+            }
+        });
+    }
 });
-// Testa Netlify-funktionen
-const testBtn = document.getElementById('testBtn');
-if (testBtn) {
-    testBtn.addEventListener('click', async () => {
-        console.log('Testar Netlify-funktion...');
-        try {
-            const response = await fetch('/.netlify/functions/test-endpoint', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ test: true })
-            });
-            
-            const data = await response.json();
-            console.log('Test-respons:', data);
-            alert(`Test resultat: ${JSON.stringify(data, null, 2)}`);
-        } catch (error) {
-            console.error('Test-fel:', error);
-            alert(`Test-fel: ${error.message}`);
-        }
-    });
-}
