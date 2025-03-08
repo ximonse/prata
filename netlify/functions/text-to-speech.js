@@ -13,7 +13,19 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'Text saknas' }) };
     }
 
+    // Kontrollera textlängden - OpenAI har en gräns på 4096 tecken
+    if (text.length > 4090) {
+      return { 
+        statusCode: 400, 
+        body: JSON.stringify({ 
+          error: 'Texten är för lång. Maxgränsen är 4090 tecken per segment.' 
+        }) 
+      };
+    }
+
     // Anropa OpenAI TTS API
+    console.log(`Skickar text med ${text.length} tecken till OpenAI API`);
+    
     const response = await axios({
       method: 'post',
       url: 'https://api.openai.com/v1/audio/speech',
@@ -29,6 +41,8 @@ exports.handler = async (event) => {
       responseType: 'arraybuffer'
     });
 
+    console.log('Svar från OpenAI API mottaget');
+
     // Returnera ljudfilen
     return {
       statusCode: 200,
@@ -39,10 +53,35 @@ exports.handler = async (event) => {
       isBase64Encoded: true
     };
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error:', error.response?.data || error.message);
+    
+    // Om felet kommer från OpenAI API och är i arraybuffer-format
+    if (error.response?.data instanceof ArrayBuffer) {
+      const decoder = new TextDecoder('utf-8');
+      const errorText = decoder.decode(error.response.data);
+      try {
+        const errorJSON = JSON.parse(errorText);
+        return {
+          statusCode: error.response.status,
+          body: JSON.stringify({ 
+            error: errorJSON.error?.message || 'Ett fel uppstod vid anslutning till OpenAI' 
+          })
+        };
+      } catch {
+        return {
+          statusCode: error.response.status,
+          body: JSON.stringify({ 
+            error: 'Ett fel uppstod vid anslutning till OpenAI' 
+          })
+        };
+      }
+    }
+    
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Något gick fel vid konverteringen' })
+      body: JSON.stringify({ 
+        error: error.response?.data?.error?.message || error.message || 'Något gick fel vid konverteringen' 
+      })
     };
   }
 };
