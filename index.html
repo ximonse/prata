@@ -10,41 +10,35 @@
     <div class="container">
         <h1>Text till Tal</h1>
         
-            <div class="input-area">
-        <textarea id="textInput" placeholder="Skriv eller klistra in text här..."></textarea>
+        <div class="input-area">
+            <textarea id="textInput" placeholder="Skriv eller klistra in text här..."></textarea>
+            
+            <div class="controls">
+                <select id="voiceSelect">
+                    <option value="alloy">Alloy</option>
+                    <option value="echo">Echo</option>
+                    <option value="fable">Fable</option>
+                    <option value="onyx">Onyx</option>
+                    <option value="nova">Nova</option>
+                    <option value="shimmer">Shimmer</option>
+                </select>
+                <button id="convertBtn">Konvertera till tal</button>
+                <button id="testBtn" style="margin-left: 10px; background-color: #6c757d;">Testa API</button>
+            </div>
+        </div>
         
-        <div class="controls">
-            <select id="voiceSelect">
-                <option value="alloy">Alloy</option>
-                <option value="echo">Echo</option>
-                <option value="fable">Fable</option>
-                <option value="onyx">Onyx</option>
-                <option value="nova">Nova</option>
-                <option value="shimmer">Shimmer</option>
-            </select>
-            <button id="convertBtn">Konvertera till tal</button>
+        <!-- Laddningsindikator -->
+        <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+            <div class="spinner"></div>
+            <p>Konverterar text till tal...</p>
+        </div>
+        
+        <div class="audio-player" id="audioPlayer" style="display: none;">
+            <audio id="audioElement" controls></audio>
+            <button id="downloadBtn">Ladda ner ljudfil</button>
         </div>
     </div>
     
-    <!-- Enkel laddningsindikator - LÄGG TILL HÄR -->
-    <div id="loadingIndicator" class="loading-indicator" style="display: none;">
-        <div class="spinner"></div>
-        <p>Konverterar text till tal...</p>
-    </div>
-    
-    <div class="audio-player" id="audioPlayer" style="display: none;">
-        <audio id="audioElement" controls></audio>
-        <button id="downloadBtn">Ladda ner ljudfil</button>
-    </div>
-        <div class="controls">
-    <select id="voiceSelect">
-        <option value="alloy">Alloy</option>
-        <option value="echo">Echo</option>
-        <option value="fable">Fable</option>
-        <option value="onyx">Onyx</option>
-        <option value="nova">Nova</option>
-        <option value="shimmer">Shimmer</option>
-    </select>
-    <button id="convertBtn">Konvertera till tal</button>
-    <button id="testBtn" style="margin-left: 10px; background-color: #6c757d;">Testa API</button>
-</div>
+    <script src="js/script.js"></script>
+</body>
+</html>
