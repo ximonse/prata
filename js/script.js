@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // Dela upp texten i mindre bitar på ca 500 tecken (vid meningsgränser)
-        textChunks = splitTextIntoChunks(fullText, 500);
+        textChunks = splitTextIntoChunks(fullText, 4060);
         audioChunks = [];
         currentChunkIndex = 0;
         
