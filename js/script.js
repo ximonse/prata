@@ -124,20 +124,48 @@ document.addEventListener('DOMContentLoaded', () => {
             convertBtn.textContent = 'Konvertera till tal';
         }
     });
-    
-    downloadBtn.addEventListener('click', () => {
-        if (!audioBlob) return;
-        
-        console.log('Laddar ner ljudfil...');
-        
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(audioBlob);
-        a.download = 'text-till-tal.mp3';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    });
-    
+
+            downloadBtn.addEventListener('click', () => {
+            if (!audioBlob) return;
+            
+            console.log('Laddar ner ljudfil...');
+            
+            // Hämta texten för att generera filnamn
+            const text = textInput.value.trim();
+            
+            // Skapa filnamnet baserat på första raden och dagens datum
+            let fileName = 'text-till-tal.mp3'; // Standard filnamn
+            
+            if (text) {
+                // Hämta första raden (upp till första radbrytningen)
+                const firstLine = text.split('\n')[0].trim();
+                
+                // Begränsa till 30 tecken för att undvika för långa filnamn
+                const shortTitle = firstLine.substring(0, 30);
+                
+                // Skapa datumstämpel i YYmmdd-format
+                const today = new Date();
+                const year = today.getFullYear().toString().substring(2); // Tar bara de sista två siffrorna
+                const month = (today.getMonth() + 1).toString().padStart(2, '0');
+                const day = today.getDate().toString().padStart(2, '0');
+                const dateStamp = `${year}${month}${day}`;
+                
+                // Sätt ihop filnamnet: titel + datum
+                fileName = `${shortTitle} ${dateStamp}.mp3`;
+                
+                // Ersätt tecken som inte är tillåtna i filnamn
+                fileName = fileName.replace(/[/\\?%*:|"<>]/g, '-');
+            }
+            
+            console.log('Filnamn för nedladdning:', fileName);
+            
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(audioBlob);
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
     // Testa Netlify-funktionen
     if (testBtn) {
         testBtn.addEventListener('click', async () => {
